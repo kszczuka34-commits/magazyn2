@@ -23,8 +23,6 @@ if categories:
 else:
     st.info("Brak kategorii w bazie.")
 
----
-
 # --- SEKCJA 2: DODAWANIE KATEGORII ---
 st.header("Dodaj nową kategorię")
 with st.form("add_category_form"):
@@ -44,7 +42,6 @@ with st.form("add_category_form"):
         else:
             st.warning("Nazwa kategorii jest wymagana.")
 
----
 
 # --- SEKCJA 3: USUWANIE KATEGORII ---
 st.header("Usuń kategorię")
