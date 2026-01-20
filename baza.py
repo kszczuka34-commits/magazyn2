@@ -99,11 +99,30 @@ elif menu == "📦 Produkty":
             })
         st.table(display_data)
         
-        st.subheader("🗑️ Usuń produkt")
-        prod_to_del = st.selectbox("Wybierz produkt", options=products_data, format_func=lambda x: x['nazwa'])
-        if st.button("Usuń wybrany produkt"):
-            supabase.table("produkty").delete().eq("id", prod_to_del['id']).execute()
-            st.rerun()
+        st.divider()
+        col_sub, col_del = st.columns(2)
+        
+        with col_sub:
+            st.subheader("📤 Usuń wybraną liczbę sztuk")
+            selected_p_sub = st.selectbox("Wybierz produkt do wydania", options=products_data, format_func=lambda x: f"{x['nazwa']} (Dostępne: {x['liczba']})")
+            qty_to_remove = st.number_input("Liczba sztuk do usunięcia", min_value=1, max_value=int(selected_p_sub['liczba']) if selected_p_sub['liczba'] > 0 else 1)
+            
+            if st.button("Odejmij sztuki"):
+                if selected_p_sub['liczba'] >= qty_to_remove:
+                    new_qty = selected_p_sub['liczba'] - qty_to_remove
+                    supabase.table("produkty").update({"liczba": new_qty}).eq("id", selected_p_sub['id']).execute()
+                    st.success(f"Zaktualizowano stan produktu: {selected_p_sub['nazwa']}")
+                    st.rerun()
+                else:
+                    st.error("Błąd: Nie masz tyle sztuk w magazynie!")
+
+        with col_del:
+            st.subheader("🗑️ Usuń produkt całkowicie")
+            prod_to_del = st.selectbox("Wybierz produkt do skasowania", options=products_data, format_func=lambda x: x['nazwa'], key="del_select")
+            if st.button("Usuń całkowicie z bazy"):
+                supabase.table("produkty").delete().eq("id", prod_to_del['id']).execute()
+                st.success("Produkt usunięty z bazy.")
+                st.rerun()
     else:
         st.info("Brak produktów w magazynie.")
 
